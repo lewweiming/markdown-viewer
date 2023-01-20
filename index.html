@@ -1,0 +1,53 @@
+<!-- 
+MARKDOWN VIEWER IS A SINGLE PAGE APP TO VIEW MARKDOWN NOTES EXTERNALLY 
+
+Usage:
+/apps/markdown-viewer/?src=https://domain.com/asset.md
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset=utf-8>
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/css/markdown.css" />
+</head>
+
+<body>
+    <div id="preview" class="markdown markdown-body">
+        # I'm a markdown page
+    </div>
+
+    <!-- FOOTER SCRIPTS -->
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const src = urlParams.get('src')
+
+        /* FETCH */
+        async function fetchMarkdown() {
+            let r = await fetch(src, {
+                method: 'GET',
+            });
+
+            let result = await r.text();
+
+            return result
+        }
+
+        function renderMarkdown(m) {
+
+            let n = document.getElementById('preview')
+            n.innerHTML = marked.parse(m)
+        }
+
+        fetchMarkdown().then(r => {
+            renderMarkdown(r)
+        });
+
+    </script>
+</body>
+
+</html>
