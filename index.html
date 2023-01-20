@@ -13,14 +13,102 @@ Usage:
     <title></title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="/css/markdown.css" />
+
+    <!-- CUSTOM STYLES -->
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+        }
+
+        aside {
+            display: inline-block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #FAFAFA;
+            height: 100vh;
+            width: 300px;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        main {
+            display: inline-block;
+            margin-left: 300px;
+            height: 100vh;
+            padding: 50px;
+        }
+
+        /* TOC */
+        #outline ul {
+            list-style-type: none;
+            list-style-position: inside;
+            line-height: 30px;
+            padding-left: 15px;
+        }
+
+        #outline li a {
+            text-decoration: none;
+            color: black;
+        }
+
+        #toc-header {
+            font-size: 18px;
+            padding: 15px;
+            border-bottom: 3px solid black;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="preview" class="markdown markdown-body">
-        # I'm a markdown page
-    </div>
+
+    <aside id="outline">
+        Sidebar
+    </aside>
+
+    <main>
+        <div id="preview" class="markdown markdown-body">
+            # I'm a markdown page
+        </div>
+    </main>
 
     <!-- FOOTER SCRIPTS -->
+    <script>
+        /* Marked JS Init */
+        var toc = [];
+        var renderer = (function () {
+            var renderer = new marked.Renderer();
+            renderer.heading = function (text, level, raw) {
+                var anchor = this.options.headerPrefix + raw.toLowerCase().replace(/[^\w]+/g, '-');
+                toc.push({
+                    anchor: anchor,
+                    level: level,
+                    text: text
+                });
+                return '<h'
+                    + level
+                    + ' id="'
+                    + anchor
+                    + '">'
+                    + text
+                    + '</h'
+                    + level
+                    + '>\n'
+                    + '<a href="#toc-header">Outline<a>\n';
+            };
+            return renderer;
+        })();
+
+        marked.setOptions({
+            renderer: renderer,
+        });
+
+    </script>
     <script>
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
@@ -43,8 +131,19 @@ Usage:
             n.innerHTML = marked.parse(m)
         }
 
+        function renderTOChtml() {
+            var tocHTML = '<h1 id="toc-header">Outline</h1>\n<ul>';
+            toc.forEach(function (entry) {
+            tocHTML += '<li><a href="#'+entry.anchor+'">'+entry.text+'<a></li>\n';
+            });
+            tocHTML += '</ul>\n';    
+            
+            document.querySelector('#outline').innerHTML = tocHTML;
+        }
+
         fetchMarkdown().then(r => {
             renderMarkdown(r)
+            renderTOChtml()
         });
 
     </script>
