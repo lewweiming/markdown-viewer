@@ -1,5 +1,7 @@
 # markdown-viewer
-A simple markdown viewer for remotely fetched markdown documents
+A simple markdown viewer for remotely fetched markdown documents.
+
+Powered by marked.js
 
 ## Usage
 
